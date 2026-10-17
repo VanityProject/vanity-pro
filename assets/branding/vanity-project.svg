@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-labelledby="brand-title">
+<title id="brand-title">VanityProject organization logo</title>
+<metadata>VanityProject. Faceted V in application teal and charcoal. Wordmark: Inter 4.1 Bold 700; attribution: Inter 4.1 Medium 500. Font source: https://github.com/rsms/inter/releases/tag/v4.1. Outlined text; no runtime font dependency.</metadata>
+<defs>
+  <linearGradient id="mint-face" x1="350" y1="210" x2="550" y2="760" gradientUnits="userSpaceOnUse">
+    <stop stop-color="#7debe1"/><stop offset="1" stop-color="#37c9c6"/>
+  </linearGradient>
+  <linearGradient id="teal-face" x1="200" y1="250" x2="610" y2="800" gradientUnits="userSpaceOnUse">
+    <stop stop-color="#12aeb1"/><stop offset="1" stop-color="#07888e"/>
+  </linearGradient>
+</defs>
+<rect width="1024" height="1024" fill="#171b20"/>
+<g id="vanity-mark">
+  <path fill="url(#teal-face)" d="M150 210H345L512 565 679 210H874L607 755 512 850 417 755Z"/>
+  <path fill="url(#mint-face)" d="M150 210H345L512 565 455 686 287 330Z"/>
+  <path fill="#0c989e" d="M150 210 287 330 455 686 417 755Z"/>
+  <path fill="url(#mint-face)" d="M679 210H874L558 673 417 755 512 565Z"/>
+  <path fill="#078c93" d="M874 210 733 330 607 755 558 673Z"/>
+  <path fill="#0ca9ae" d="M417 755 558 673 607 755 512 850Z"/>
+</g>
+</svg>

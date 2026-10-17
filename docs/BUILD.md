@@ -73,3 +73,21 @@ inputs prevents a complete build.
 Download ready-made packages from [Releases](https://github.com/VanityProject/vanity-pro/releases).
 Each includes the application, user instructions, required dependency notices,
 and checksums. Source code is MIT-licensed; third-party notices are in `licenses/`.
+
+## Rebuild the branding
+
+The logos are SVG geometry with outlined typography from **Inter 4.1 Bold (700)**
+and **Inter 4.1 Medium (500)**. The original, unmodified font files and their SIL
+Open Font License are in `assets/branding/fonts/`. They came from the official
+[Inter 4.1 release](https://github.com/rsms/inter/releases/tag/v4.1); the generator
+checks both font hashes before outlining the text. SVG viewing needs no fonts.
+
+To regenerate the SVGs and GitHub PNG exports, use Node.js and the pinned renderer:
+
+```sh
+npm install --prefix target/branding --no-save --package-lock=false @napi-rs/canvas@0.1.100
+node assets/branding/generate.cjs --modules target/branding/node_modules --png-dir target/branding
+```
+
+The script records the vector coordinates, colors, exact text, font sizes, weights,
+and tracking. This optional branding command is separate from application builds.

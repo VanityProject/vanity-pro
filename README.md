@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/branding/vanity-pro.svg" alt="Vanity Pro by VanityProject" width="800">
+</p>
+
 # Vanity Pro 0.4.1
 
 Vanity Pro generates vanity wallet addresses without a network connection.
