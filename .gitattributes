@@ -1,0 +1,5 @@
+# Keep source and license text consistent across Windows and Linux checkouts.
+* text=auto eol=lf
+
+# Fixture and packaging-policy SHA256 hashes depend on the original JSON bytes.
+*.json -text

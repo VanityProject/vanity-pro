@@ -1,0 +1,70 @@
+# Warthog mainnet
+
+Select **Warthog** in the desktop blockchain selector, or use:
+
+```powershell
+.\vanity.exe generate --chain warthog --prefix 00000 --backend auto
+```
+
+CPU and OpenCL GPU modes are separate; Automatic prefers a validated GPU and
+falls back to CPU when none is available. The profile is an ordinary mainnet
+secp256k1 account. Mining, DeFi/testnet, mnemonics and transaction broadcasting
+are outside this profile.
+
+The address is 48 lowercase hexadecimal characters without a version byte or
+`0x`: 40 characters of RIPEMD160(SHA256(compressed public key)), then eight checksum
+characters from the first four bytes of **single** SHA256(payload). Uppercase
+patterns are normalized to lowercase. Prefix and suffix lengths together must
+not exceed 48. Non-hexadecimal input and `0x` are rejected.
+
+For prefixes within the first 40 characters, CPU and GPU workers match payload
+nibble masks and defer checksum computation and full encoding until a hit is
+reported. Suffixes include checksum positions and require checksum validation;
+payload masks run first. A prefix that determines all payload bits validates any
+specified checksum once during pattern compilation. Complete valid addresses
+have 160 bits of payload difficulty. Prefix-only difficulty is exact under the
+uniform payload model; checksum-dependent estimates use the existing bounded
+public sample and suppress sparse estimates. Measured rates depend on the pattern.
+
+## Encrypted storage and native import
+
+Finalize and verify the encrypted wallet using the normal password prompts.
+Choose **Export Native Import File...** or explicitly run:
+
+```powershell
+.\vanity.exe export-native --wallet .\encrypted-wallet.json --out .\warthog-native.json
+```
+
+The native file contains a plaintext private key. Owner-only storage and
+no-overwrite protections still apply. Its exact Core-compatible fields are
+`address` (48 hex characters), `privateKey` (64), and `publicKey` (66, compressed).
+Leading zeroes in the private key are preserved.
+
+For the qualified mainnet Core CLI, select this JSON as the wallet file:
+
+```sh
+./wart-wallet -a -f ./warthog-native.json
+```
+
+This reads and validates the keypair and prints its receiving address without
+contacting a node. Confirm it equals Vanity Pro's verified address. Core also
+checks that all three native fields agree. In Wart Dapp, choose the wallet
+selection screen's **private key** import workflow and enter the `privateKey`
+field, preserving all 64 hex characters. Set the Dapp's wallet password and confirm
+the receiving address. No mnemonic is generated.
+
+## Compatible wallet versions
+
+The target is mainnet Core 0.8.20 revision
+`54403b863c2cbd47da2e1414a0362a4c8bf01a03` and Wart Dapp revision
+`9ecf315d5faffd18bd4b974e777be6205f68f29a`. Current documentation also describes
+DeFi wallets; its official SDKs target the DeFi testnet API. Compatibility here
+is qualified against these pinned mainnet implementations.
+
+
+References: [address rules](https://docs.warthog.network/developers/integration/wallets/),
+[Core CLI wallet](https://docs.warthog.network/guides/wallet/cli/),
+[Wart Dapp import](https://docs.warthog.network/guides/wallet/wart-dapp/),
+[SDK scope](https://docs.warthog.network/developers/sdks/),
+[pinned Core](https://github.com/warthog-network/core/tree/54403b863c2cbd47da2e1414a0362a4c8bf01a03),
+[pinned Dapp](https://github.com/warthog-network/wart-dapp/tree/9ecf315d5faffd18bd4b974e777be6205f68f29a).

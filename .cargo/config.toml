@@ -1,0 +1,3 @@
+[target.x86_64-pc-windows-msvc]
+# Keep the CPU binary deployable without a separately installed VC runtime.
+rustflags = ["-C", "target-feature=+crt-static"]
