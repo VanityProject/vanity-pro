@@ -45,7 +45,7 @@ See [hardware coverage](docs/COMPATIBILITY.md).
 | Dogecoin | Compressed P2PKH | CPU / OpenCL | Network-specific WIF plus descriptor |
 | Bitcoin Cash | P2PKH CashAddr | CPU / OpenCL | WIF plus address/type metadata |
 | Cosmos Hub | Ordinary secp256k1 account | CPU / OpenCL | Raw private-key hex |
-| Warthog | Mainnet account | CPU / OpenCL | Core wallet JSON; Wart Dapp private-key import |
+| Warthog | Mainnet account | CPU / OpenCL | Encrypted Wart Dapp database (`.db`); Core wallet JSON (`.json`) |
 | XRP Ledger | secp256k1 classic account | CPU / OpenCL | XRPL SDK raw keypair; no family seed |
 | Solana | Ordinary Ed25519 keypair | CPU | 64-byte keypair JSON |
 | Stellar | Ordinary Ed25519 account | CPU | Secret StrKey |
@@ -65,7 +65,7 @@ Solana, Stellar, and Algorand use the standard Ed25519 CPU implementation.
 After a match, select **Save wallet**. Unlock the session and select an encrypted wallet file.
 The application checks the saved wallet before it enables **Copy address**.
 A reopened export requires **Do wallet check** before you copy the address.
-Native import files are optional and contain an unencrypted private key.
+Native import files are optional. Warthog `.db` files encrypt the private key with the wallet password; other native formats can contain an unencrypted key.
 
 **Keep the session files and their password until you have verified the saved wallet.**
 Passwords are not saved in preferences. See [key custody and recovery](docs/SECURITY.md).

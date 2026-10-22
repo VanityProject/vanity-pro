@@ -24,6 +24,8 @@ pub(crate) mod probability;
 mod ed_batch;
 #[path = "key_manager/multichain.rs"]
 mod multichain;
+#[path = "key_manager/warthog_dapp.rs"]
+mod warthog_dapp;
 
 const ITERATIONS: u32 = 600_000;
 type AesCtr = ctr::Ctr128BE<aes::Aes128>;
@@ -400,7 +402,8 @@ pub fn verify_wallet(path: &Path, password: &str, pattern: Option<&Pattern>) -> 
     Ok(checksum(&addr))
 }
 
-/// Write an explicitly requested native plaintext wallet backup, without printing its key.
+/// Write an explicitly requested native import file without printing its key.
+/// Warthog `.db` output is encrypted for Wart Dapp; other native formats can be plaintext.
 pub fn export_native(path: &Path, password: &str, out: &Path) -> Result<String> {
     let _path_guard = storage::guard(path)?;
     let _output_guard = storage::guard(out)?;

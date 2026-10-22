@@ -26,6 +26,7 @@ pub const COPY: &str = "Copy the public address. First, save the encrypted walle
 pub const ANOTHER_COPY: &str =
     "Save the same wallet to a new encrypted file. Enter the session password first.";
 pub const NATIVE: &str = "CAUTION: Do not give this file to other persons. It contains an unencrypted private key. They can control the wallet.";
+pub const WARTHOG_DAPP: &str = "The database encrypts your Warthog key with the wallet password. Import it with Wart Dapp's Import existing database.";
 pub const RECOVERY: &str = "Keep the encrypted wallet and its password. Also keep the session recovery files and the session password.";
 pub const SEED_PASSWORD: &str =
     "Set a session password. This password is necessary to save the wallet after a match.";
@@ -59,7 +60,7 @@ pub const ED25519: &str = "This profile uses CPU workers. Each attempt uses a ne
 pub const XRP: &str = "The native file contains an XRPL SDK keypair. The application does not make an XRP family seed.";
 pub const WARTHOG: &str = "The address has 48 hexadecimal characters. The last eight characters are the checksum. Do not enter 0x.";
 pub const WARTHOG_IMPORT: &str =
-    "The native file uses the Core wallet JSON format. For Wart Dapp, import its privateKey field.";
+    "Export a .db file for Wart Dapp's Import existing database. Export .json for Warthog Core.";
 pub const MATCH: &str = "Do not use this address. Select Save wallet to do the key ownership check and save an encrypted file.";
 pub const EXPORT_RECORD: &str =
     "This is a saved export record. Select Do wallet check before you copy the address.";

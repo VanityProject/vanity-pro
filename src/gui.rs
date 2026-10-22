@@ -52,6 +52,7 @@ enum PasswordStep {
     Verify,
     Resume,
     Native,
+    WartDapp,
 }
 struct PasswordForm {
     step: PasswordStep,
@@ -73,12 +74,13 @@ impl PasswordForm {
         }
     }
 }
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 enum Pick {
     Sessions,
     Wallets,
     Export,
     NativeExport,
+    WartDappExport,
     SplitRequestImport,
     SplitRequestExport,
     SplitResultImport,
@@ -250,6 +252,18 @@ impl App {
                             .set_file_name(format!("native-{suggested}"))
                             .save_file()
                     }
+                    Pick::WartDappExport => {
+                        desktop::create_root(&settings.wallets_root)?;
+                        rfd::FileDialog::new()
+                            .set_title("Save encrypted Wart Dapp import database")
+                            .add_filter("Wart Dapp database", &["db"])
+                            .set_directory(&settings.wallets_root)
+                            .set_file_name(format!(
+                                "wart-dapp-{}.db",
+                                suggested.trim_end_matches(".json")
+                            ))
+                            .save_file()
+                    }
                     Pick::Export => {
                         desktop::create_root(&settings.wallets_root)?;
                         rfd::FileDialog::new()
@@ -329,13 +343,34 @@ impl App {
                             s.wallets_root = path
                         }
                     }
-                    Pick::NativeExport => {
+                    Pick::NativeExport | Pick::WartDappExport => {
                         if let Some(f) = &mut self.passwords {
-                            let password =
-                                std::mem::replace(&mut f.password, Zeroizing::new(String::new()));
-                            match self.engine.export_native_wallet(path, password) {
-                                Err(e) => f.error = Some(format!("{e:#}")),
-                                Ok(()) => self.clear_passwords(ctx),
+                            let extension = path
+                                .extension()
+                                .and_then(|extension| extension.to_str())
+                                .unwrap_or("");
+                            let database_path = ["db", "db3", "sqlite"]
+                                .iter()
+                                .any(|name| extension.eq_ignore_ascii_case(name));
+                            if (kind == Pick::WartDappExport
+                                && !extension.eq_ignore_ascii_case("db"))
+                                || (kind == Pick::NativeExport && database_path)
+                            {
+                                let message = if kind == Pick::WartDappExport {
+                                    "Save the Wart Dapp database with a .db extension."
+                                } else {
+                                    "Use Export Wart Dapp database for .db files."
+                                };
+                                f.error = Some(message.into());
+                            } else {
+                                let password = std::mem::replace(
+                                    &mut f.password,
+                                    Zeroizing::new(String::new()),
+                                );
+                                match self.engine.export_native_wallet(path, password) {
+                                    Err(e) => f.error = Some(format!("{e:#}")),
+                                    Ok(()) => self.clear_passwords(ctx),
+                                }
                             }
                         }
                     }
@@ -424,6 +459,7 @@ impl App {
             PasswordStep::Verify => "Do wallet check",
             PasswordStep::Resume => "Resume CPU search",
             PasswordStep::Native => "Export native import file",
+            PasswordStep::WartDapp => "Export Wart Dapp database",
         };
         let mut submit = false;
         let mut cancel = false;
@@ -432,6 +468,7 @@ impl App {
             ui.heading(title);
             ui.label(match form.step {
                 PasswordStep::Native => text::NATIVE,
+                PasswordStep::WartDapp => text::WARTHOG_DAPP,
                 PasswordStep::Resume => text::RESUME_PASSWORD,
                 PasswordStep::Seed => text::SEED_PASSWORD,
                 PasswordStep::Owner => text::SPLIT_SHARE_PASSWORD,
@@ -457,7 +494,10 @@ impl App {
                 } else {
                     "Session password"
                 }
-            } else if matches!(form.step, PasswordStep::Verify | PasswordStep::Native) {
+            } else if matches!(
+                form.step,
+                PasswordStep::Verify | PasswordStep::Native | PasswordStep::WartDapp
+            ) {
                 "Wallet password"
             } else {
                 "Password"
@@ -482,6 +522,7 @@ impl App {
                     | PasswordStep::Verify
                     | PasswordStep::Resume
                     | PasswordStep::Native
+                    | PasswordStep::WartDapp
             ) {
                 let label = ui.label("Confirm password");
                 let mut field = egui::TextEdit::singleline(&mut *form.confirmation)
@@ -505,6 +546,7 @@ impl App {
                     | PasswordStep::Verify
                     | PasswordStep::Resume
                     | PasswordStep::Native
+                    | PasswordStep::WartDapp
             ) {
                 !form.password.is_empty()
             } else {
@@ -519,6 +561,7 @@ impl App {
                 }
                 let text = match form.step {
                     PasswordStep::Native => "Select file and export private key",
+                    PasswordStep::WartDapp => "Select file and export database",
                     PasswordStep::Resume => "Unlock and resume",
                     PasswordStep::Seed => "Save session and start search",
                     PasswordStep::Owner => "Save private share",
@@ -557,6 +600,11 @@ impl App {
             match form.step {
                 PasswordStep::Native => {
                     if let Err(e) = self.pick(Pick::NativeExport) {
+                        form.error = Some(format!("{e:#}"));
+                    }
+                }
+                PasswordStep::WartDapp => {
+                    if let Err(e) = self.pick(Pick::WartDappExport) {
                         form.error = Some(format!("{e:#}"));
                     }
                 }
@@ -2130,6 +2178,27 @@ mod tests {
             wait(&mut h, |a| !a.engine.busy() && a.passwords.is_none());
             assert!(native.exists(), "{:?}", h.state().engine.error);
             assert!(h.state().engine.notice.contains("unencrypted private key"));
+            if chain == crate::chains::Chain::Warthog {
+                let dapp = temp.path().join("wart-dapp.db");
+                click(&mut h, "Export Wart Dapp database");
+                input(
+                    &mut h,
+                    Role::PasswordInput,
+                    "Wallet password",
+                    "throwaway wallet password",
+                );
+                h.state_mut().test_export_path = Some(dapp.clone());
+                click(&mut h, "Select file and export database");
+                wait(&mut h, |a| !a.engine.busy() && a.passwords.is_none());
+                assert!(dapp.exists(), "{:?}", h.state().engine.error);
+                assert!(
+                    h.state()
+                        .engine
+                        .notice
+                        .contains("Encrypted Wart Dapp database")
+                );
+                assert_eq!(&std::fs::read(dapp).unwrap()[..16], b"SQLite format 3\0");
+            }
             if chain == crate::chains::Chain::Ethereum
                 && let Some(root) = std::env::var_os("VANITY_GUI_FIXTURE_DIR")
             {

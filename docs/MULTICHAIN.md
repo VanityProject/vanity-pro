@@ -33,8 +33,9 @@ application escrows are not ordinary signing accounts and are not enabled.
 Warthog uses compressed-public-key Hash160 plus four bytes of single SHA256 of
 that payload, encoded as 48 lowercase hex characters. The checksum follows the
 40 payload characters, so leading-pattern searches defer checksum work until a
-candidate is reported. Native export preserves a 64-character private key with
-leading zeroes and the corresponding compressed public key. See the separate
+candidate is reported. The Core JSON export preserves a 64-character private key
+with leading zeroes and the corresponding compressed public key. The Wart Dapp
+`.db` export encrypts that same key using the wallet password. See the separate
 [mainnet import guide](WARTHOG.md).
 
 ## Matching and probability

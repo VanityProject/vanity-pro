@@ -1167,6 +1167,17 @@ impl App {
                             {
                                 self.passwords = Some(PasswordForm::new(PasswordStep::Native));
                             }
+                            if session.job.profile().chain == crate::chains::Chain::Warthog
+                                && ui
+                                    .add_enabled(
+                                        self.available(),
+                                        egui::Button::new("Export Wart Dapp database"),
+                                    )
+                                    .help_text(text::WARTHOG_DAPP)
+                                    .clicked()
+                            {
+                                self.passwords = Some(PasswordForm::new(PasswordStep::WartDapp));
+                            }
                         });
                     } else if ui
                         .add_enabled(
@@ -1444,7 +1455,9 @@ fn prefix_rules(profile: crate::chains::Profile) -> &'static str {
 }
 
 fn native_format(profile: crate::chains::Profile) -> &'static str {
-    if profile.is_evm() {
+    if profile.chain == crate::chains::Chain::Warthog {
+        "Wart Dapp database (.db) or Core wallet JSON (.json)"
+    } else if profile.is_evm() {
         "Raw private key in hexadecimal"
     } else {
         profile.info().export

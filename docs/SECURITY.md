@@ -34,9 +34,10 @@ funds.
 - Passwords use hidden interactive input and Zeroizing buffers. New passwords
   require confirmation and at least 12 bytes. GUI fields clear undo history.
   Passwords are never command arguments, preferences, progress or logs.
-- Encrypted export is the default. **Explicit native export creates a plaintext
-  private-key import file.** The UI and CLI describe that action before writing;
-  the file is never printed and is created with no-clobber private permissions.
+- Encrypted export is the default. **Most explicit native exports create a plaintext
+  private-key import file.** Warthog `.db` exports use PBKDF2/Fernet encryption
+  with the wallet password. The file is never printed and is created with
+  no-clobber private permissions.
 - Unix directories/files use 0700/0600. Windows uses an explicit protected owner
   DACL. Permission or ACL failures stop writing. Encrypted atomic writes flush
   before rename; Unix directory metadata is flushed too.
@@ -64,7 +65,8 @@ file before finalization loses that candidate's recovery path.
 After finalization back up the final encrypted wallet and its password. Select
 **Do wallet check** in the desktop app to check a backup. The CLI command is
 `vanity verify --wallet ...`. Native import files also recover the
-key, but are plaintext and require private storage. Keep the applicable Bitcoin
+key; Warthog `.db` is encrypted, while the other native formats are plaintext.
+Keep every import file private. Keep the applicable Bitcoin
 address type and descriptor; WIF alone does not tell a wallet which script to scan.
 
 ## Interrupted work and authenticity

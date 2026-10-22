@@ -169,7 +169,7 @@ enum Command {
         #[command(subcommand)]
         action: SplitCommand,
     },
-    /// Explicitly decrypt a finalized wallet into an owner-only native plaintext import file.
+    /// Export a finalized wallet in its native format; Warthog .db is encrypted for Wart Dapp.
     ExportNative {
         #[arg(long, alias = "keystore")]
         wallet: PathBuf,
@@ -842,13 +842,10 @@ fn run() -> Result<()> {
         Command::ExportNative { wallet, out } => {
             let address = vanity_pro::export_native(
                 &wallet,
-                &password("Wallet password (plaintext native export): ", false)?,
+                &password("Wallet password (native export): ", false)?,
                 &out,
             )?;
-            println!(
-                "Native wallet {address} written to {}. This file contains the private key.",
-                out.display()
-            );
+            println!("Native wallet {address} written to {}.", out.display());
         }
         Command::Generate {
             prefix,

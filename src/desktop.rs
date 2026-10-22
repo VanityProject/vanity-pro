@@ -1515,10 +1515,22 @@ impl Controller {
                 self.notice = "Wallet saved. Wallet check: correct.".into();
             }
             Ok(Outcome::NativeExported(path)) => {
-                self.notice = format!(
-                    "Native import file saved to {}. This file contains the unencrypted private key.",
-                    path.display()
-                );
+                let encrypted = path
+                    .extension()
+                    .and_then(|extension| extension.to_str())
+                    .is_some_and(|extension| {
+                        ["db", "db3", "sqlite"]
+                            .iter()
+                            .any(|name| extension.eq_ignore_ascii_case(name))
+                    });
+                self.notice = if encrypted {
+                    format!("Encrypted Wart Dapp database saved to {}.", path.display())
+                } else {
+                    format!(
+                        "Native import file saved to {}. This file contains the unencrypted private key.",
+                        path.display()
+                    )
+                };
             }
             Ok(Outcome::ExistingVerified) => {
                 self.verified_this_run = true;

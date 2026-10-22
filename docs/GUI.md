@@ -74,7 +74,7 @@ Use **Save new encrypted copy** to save the same wallet to a new file.
 For a native import file, expand **Native import file**. Read the caution and format.
 Select **Export native import file**. Enter the wallet password. Select **Select file and export private key**.
 
-CAUTION: A native import file contains an unencrypted private key. Do not give it to other persons.
+For Warthog, select **Export Wart Dapp database** to save an encrypted `.db` file for the updated wallet's **Import existing database** action. It uses the encrypted wallet password. The regular **Export native import file** action saves plaintext Core JSON. Keep every import file private.
 Keep the encrypted wallet as the default recovery file.
 See [wallet compatibility](MULTICHAIN.md) and [recovery requirements](SECURITY.md).
 

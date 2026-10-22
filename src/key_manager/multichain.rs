@@ -554,6 +554,23 @@ pub(super) fn export_native(path: &Path, password: &str, out: &Path) -> Result<S
     };
     let public = key.public(p)?;
     let addr = key.address(p)?;
+    let wart_dapp_database = out
+        .extension()
+        .and_then(|extension| extension.to_str())
+        .is_some_and(|extension| {
+            ["db", "db3", "sqlite"]
+                .iter()
+                .any(|name| extension.eq_ignore_ascii_case(name))
+        });
+    if wart_dapp_database {
+        ensure!(
+            p.chain == Chain::Warthog,
+            "Wart Dapp database export requires a Warthog wallet"
+        );
+        let database = super::warthog_dapp::database(&key.0, &addr, password)?;
+        storage::write_bytes(out, &database, false)?;
+        return Ok(addr);
+    }
     let native = Zeroizing::new(match p.chain {
         Chain::Warthog => {
             #[derive(Serialize)]
@@ -1294,6 +1311,7 @@ mod tests {
             let encrypted = folder.join("encrypted.json");
             storage::write_json(&encrypted, &store, false).unwrap();
             export_native(&encrypted, password, &folder.join("wallet.json")).unwrap();
+            export_native(&encrypted, password, &folder.join("wart-dapp.db")).unwrap();
             rows.push(serde_json::json!({"case":format!("case-{index}"),"address":address,"public_key":public_key}));
         }
         let folder = root.join("case-3");
@@ -1303,6 +1321,7 @@ mod tests {
         let encrypted = folder.join("encrypted.json");
         storage::write_bytes(&encrypted, &storage::read_bytes(&generated).unwrap(), false).unwrap();
         export_native(&encrypted, password, &folder.join("wallet.json")).unwrap();
+        export_native(&encrypted, password, &folder.join("wart-dapp.db")).unwrap();
         let store: Envelope = storage::read_json(&encrypted).unwrap();
         rows.push(serde_json::json!({"case":"case-3","address":address,"public_key":store.metadata.public_key}));
         storage::write_json(
